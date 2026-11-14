@@ -1,0 +1,154 @@
+<%
+  const filterQuery = buildQuery({
+    month: filters.month,
+    type: filters.type,
+    account: filters.accountId,
+    category: filters.categoryId,
+    search: filters.search,
+  });
+  const pageHref = function (number) {
+    return filterQuery ? filterQuery + '&page=' + number : '?page=' + number;
+  };
+  const hasFilters = filters.month || filters.type || filters.accountId || filters.categoryId || filters.search;
+%>
+
+<section class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Find transactions</h2>
+      <p class="card-subtitle">Filter by month, type, account, category or description</p>
+    </div>
+    <a href="/transactions/new" class="btn-primary btn-sm">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Add
+    </a>
+  </div>
+
+  <form method="get" action="/transactions" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div class="lg:col-span-2">
+      <label for="search" class="label">Search</label>
+      <input id="search" name="search" type="search" class="input" placeholder="Description, category or account" value="<%= filters.search %>">
+    </div>
+    <div>
+      <label for="filter-month" class="label">Month</label>
+      <select id="filter-month" name="month" class="select">
+        <option value="">All months</option>
+        <% months.forEach(function (option) { %>
+          <option value="<%= option.value %>" <%= option.value === filters.month ? 'selected' : '' %>><%= option.label %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label for="filter-type" class="label">Type</label>
+      <select id="filter-type" name="type" class="select">
+        <option value="">All types</option>
+        <option value="income" <%= filters.type === 'income' ? 'selected' : '' %>>Income</option>
+        <option value="expense" <%= filters.type === 'expense' ? 'selected' : '' %>>Expense</option>
+      </select>
+    </div>
+    <div>
+      <label for="filter-account" class="label">Account</label>
+      <select id="filter-account" name="account" class="select">
+        <option value="">All accounts</option>
+        <% accounts.forEach(function (account) { %>
+          <option value="<%= account.id %>" <%= Number(filters.accountId) === Number(account.id) ? 'selected' : '' %>><%= account.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label for="filter-category" class="label">Category</label>
+      <select id="filter-category" name="category" class="select">
+        <option value="">All categories</option>
+        <% categories.forEach(function (category) { %>
+          <option value="<%= category.id %>" <%= Number(filters.categoryId) === Number(category.id) ? 'selected' : '' %>><%= category.name %> (<%= category.kind %>)</option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-6">
+      <button type="submit" class="btn-primary btn-sm">Apply filters</button>
+      <% if (hasFilters) { %>
+        <a href="/transactions" class="btn-secondary btn-sm">Clear</a>
+      <% } %>
+      <span class="ml-auto text-xs text-slate-500">Showing <%= transactions.length %> of <%= total %></span>
+    </div>
+  </form>
+</section>
+
+<section class="card mt-6">
+  <% if (!transactions.length) { %>
+    <p class="empty-state">
+      No transactions match these filters.
+      <% if (hasFilters) { %>
+        <a href="/transactions" class="font-semibold text-brand-700 hover:text-brand-800">Clear the filters</a> or
+      <% } %>
+      <a href="/transactions/new" class="font-semibold text-brand-700 hover:text-brand-800">add a transaction</a>.
+    </p>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="hidden md:table-cell">Category</th>
+            <th scope="col" class="hidden lg:table-cell">Account</th>
+            <th scope="col" class="text-right">Amount</th>
+            <th scope="col" class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% transactions.forEach(function (item) { %>
+            <tr>
+              <td class="whitespace-nowrap text-slate-500"><%= formatDate(item.transaction_date) %></td>
+              <td>
+                <a href="/transactions/<%= item.id %>/edit" class="font-medium text-slate-800 hover:text-brand-700"><%= item.description %></a>
+                <span class="block text-xs text-slate-500 md:hidden"><%= item.category_name %> &middot; <%= item.account_name %></span>
+              </td>
+              <td class="hidden md:table-cell">
+                <span class="badge" style="background-color: <%= item.category_colour %>1a; color: <%= item.category_colour %>"><%= item.category_name %></span>
+              </td>
+              <td class="hidden lg:table-cell">
+                <span class="flex items-center gap-2 text-slate-600">
+                  <span class="h-2 w-2 rounded-full" style="background-color: <%= item.account_colour %>"></span>
+                  <%= item.account_name %>
+                </span>
+              </td>
+              <td class="whitespace-nowrap text-right font-semibold <%= item.type === 'income' ? 'text-brand-700' : 'text-slate-800' %>">
+                <%= item.type === 'income' ? '+' : '-' %><%= money(item.amount_cents) %>
+              </td>
+              <td class="whitespace-nowrap text-right">
+                <a href="/transactions/<%= item.id %>/edit" class="btn-secondary btn-xs">Edit</a>
+                <form method="post" action="/transactions/<%= item.id %>/delete" class="inline" data-confirm="Delete this transaction?">
+                  <button type="submit" class="btn-danger btn-xs">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if (pages > 1) { %>
+      <nav class="mt-4 flex flex-wrap items-center justify-between gap-3" aria-label="Transaction pages">
+        <p class="text-xs text-slate-500">Page <%= page %> of <%= pages %></p>
+        <div class="flex items-center gap-1">
+          <% if (page > 1) { %>
+            <a href="<%= pageHref(page - 1) %>" class="page-link" rel="prev">Previous</a>
+          <% } %>
+          <% for (let number = 1; number <= pages; number += 1) { %>
+            <% if (number === 1 || number === pages || Math.abs(number - page) <= 1) { %>
+              <a href="<%= pageHref(number) %>" class="page-link <%= number === page ? 'page-link-active' : '' %>" <%= number === page ? 'aria-current="page"' : '' %>><%= number %></a>
+            <% } else if (Math.abs(number - page) === 2) { %>
+              <span class="px-1 text-slate-400">&hellip;</span>
+            <% } %>
+          <% } %>
+          <% if (page < pages) { %>
+            <a href="<%= pageHref(page + 1) %>" class="page-link" rel="next">Next</a>
+          <% } %>
+        </div>
+      </nav>
+    <% } %>
+  <% } %>
+</section>

@@ -1,0 +1,135 @@
+<section class="grid gap-6 xl:grid-cols-3">
+  <div class="space-y-6 xl:col-span-2">
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">What this project does</h2>
+          <p class="card-subtitle">A solo personal finance tracker for the H6WAD final project</p>
+        </div>
+      </div>
+      <div class="prose-sm max-w-none space-y-3 text-slate-600">
+        <p>
+          Finance Tracker stores accounts, categories, transactions and monthly budgets in a SQLite
+          database. Every page is rendered on the server with Express and EJS, and the dashboard and
+          budget pages add client-side visualisations with Chart.js.
+        </p>
+        <p>
+          The app demonstrates full CRUD behaviour: you can create, read, update and delete
+          transactions, accounts and categories, and create or replace budgets for any month. All
+          money is stored as integer cents so totals never suffer from floating point rounding.
+        </p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">How the data is modelled</h2>
+          <p class="card-subtitle">Four related tables with constraints and triggers</p>
+        </div>
+      </div>
+      <div class="space-y-4 text-sm text-slate-600">
+        <div class="rounded-lg border border-slate-200 p-4">
+          <h3 class="font-semibold text-slate-900">accounts</h3>
+          <p class="mt-1">Name, type (current, savings, credit, cash), opening balance and a colour used in the interface.</p>
+        </div>
+        <div class="rounded-lg border border-slate-200 p-4">
+          <h3 class="font-semibold text-slate-900">categories</h3>
+          <p class="mt-1">Name, kind (income or expense) and a colour. Names are unique regardless of case.</p>
+        </div>
+        <div class="rounded-lg border border-slate-200 p-4">
+          <h3 class="font-semibold text-slate-900">transactions</h3>
+          <p class="mt-1">Links one account and one category, with a type, positive amount, description and date. Foreign keys use <code>ON DELETE RESTRICT</code>.</p>
+        </div>
+        <div class="rounded-lg border border-slate-200 p-4">
+          <h3 class="font-semibold text-slate-900">budgets</h3>
+          <p class="mt-1">A planned amount per category and month. A unique constraint on the pair makes saving an upsert.</p>
+        </div>
+        <p>
+          Two triggers reject any transaction whose type does not match the kind of its category, so
+          income can never be filed under an expense category even if a request bypasses the form.
+        </p>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Validation and security</h2>
+          <p class="card-subtitle">Checks on the client, on the server and in the database</p>
+        </div>
+      </div>
+      <ul class="space-y-2 text-sm text-slate-600">
+        <li>HTML inputs use types, lengths and limits to guide the user.</li>
+        <li>The server re-validates every field: amounts, dates, descriptions, foreign keys and colours.</li>
+        <li>SQLite CHECK constraints, foreign keys and triggers enforce the same rules at the storage layer.</li>
+        <li>EJS escapes output by default, so user text cannot inject HTML.</li>
+        <li>Helmet sets security headers and the session cookie is HTTP-only and same-site.</li>
+      </ul>
+    </article>
+  </div>
+
+  <aside class="space-y-6">
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Technology</h2>
+        </div>
+      </div>
+      <dl class="space-y-3 text-sm">
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Runtime</dt>
+          <dd class="font-semibold text-slate-800">Node.js</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Framework</dt>
+          <dd class="font-semibold text-slate-800">Express</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Database</dt>
+          <dd class="font-semibold text-slate-800">SQLite (node:sqlite)</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Templates</dt>
+          <dd class="font-semibold text-slate-800">EJS</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Charts</dt>
+          <dd class="font-semibold text-slate-800">Chart.js</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Styling</dt>
+          <dd class="font-semibold text-slate-800">Tailwind CSS</dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-500">Hosting</dt>
+          <dd class="font-semibold text-slate-800">Render</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Student</h2>
+        </div>
+      </div>
+      <p class="font-semibold text-slate-900">Valentin Gabriel Luchian</p>
+      <p class="text-sm text-slate-500">Student ID 24318230</p>
+      <p class="mt-3 text-sm text-slate-600">H6WAD Web Application Development, National College of Ireland, 2026.</p>
+    </article>
+
+    <article class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">API</h2>
+          <p class="card-subtitle">Read-only JSON endpoints</p>
+        </div>
+      </div>
+      <ul class="space-y-2 text-sm">
+        <li><a href="/api/dashboard" class="font-semibold text-brand-700 hover:text-brand-800">/api/dashboard</a><span class="block text-xs text-slate-500">Dashboard figures for the current month.</span></li>
+        <li><a href="/api/health" class="font-semibold text-brand-700 hover:text-brand-800">/api/health</a><span class="block text-xs text-slate-500">Health check used by Render.</span></li>
+      </ul>
+    </article>
+  </aside>
+</section>

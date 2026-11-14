@@ -1,0 +1,50 @@
+<section class="card max-w-2xl">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Edit account</h2>
+      <p class="card-subtitle">Changing the opening balance recalculates the current balance.</p>
+    </div>
+  </div>
+
+  <form method="post" action="<%= action %>" novalidate class="space-y-5">
+    <div>
+      <label for="account-name" class="label">Name</label>
+      <input id="account-name" name="name" type="text" class="input <%= errors.name ? 'input-error' : '' %>" value="<%= values.name %>" maxlength="40" required>
+      <% if (errors.name) { %><p class="error-text"><%= errors.name %></p><% } %>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label for="account-type" class="label">Type</label>
+        <select id="account-type" name="type" class="select <%= errors.type ? 'input-error' : '' %>" required>
+          <% ['current', 'savings', 'credit', 'cash'].forEach(function (type) { %>
+            <option value="<%= type %>" <%= values.type === type ? 'selected' : '' %>><%= type.charAt(0).toUpperCase() + type.slice(1) %></option>
+          <% }); %>
+        </select>
+        <% if (errors.type) { %><p class="error-text"><%= errors.type %></p><% } %>
+      </div>
+      <div>
+        <label for="account-balance" class="label">Opening balance (EUR)</label>
+        <input id="account-balance" name="opening_balance" type="text" inputmode="decimal" class="input <%= errors.openingBalance ? 'input-error' : '' %>" value="<%= values.openingBalance %>" required>
+        <% if (errors.openingBalance) { %><p class="error-text"><%= errors.openingBalance %></p><% } %>
+      </div>
+    </div>
+
+    <div>
+      <label for="account-colour" class="label">Colour</label>
+      <div class="flex items-center gap-3">
+        <input id="account-colour" name="colour" type="color" class="h-10 w-14 cursor-pointer rounded-lg border border-slate-300 bg-white p-1" value="<%= values.colour %>">
+        <span class="text-xs text-slate-500">Used for badges and charts.</span>
+      </div>
+      <% if (errors.colour) { %><p class="error-text"><%= errors.colour %></p><% } %>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-5">
+      <button type="submit" class="btn-primary">Save changes</button>
+      <a href="/accounts" class="btn-secondary">Cancel</a>
+      <button type="submit" form="deleteAccountForm" class="btn-danger ml-auto">Delete account</button>
+    </div>
+  </form>
+
+  <form id="deleteAccountForm" method="post" action="<%= action %>/delete" data-confirm="Delete this account? Accounts with transactions cannot be removed."></form>
+</section>

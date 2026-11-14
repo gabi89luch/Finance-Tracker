@@ -1,0 +1,178 @@
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <form method="get" action="/" class="flex flex-wrap items-center gap-2">
+    <label for="month" class="label mb-0">Month</label>
+    <select id="month" name="month" class="select w-auto" data-auto-submit>
+      <% months.forEach(function (option) { %>
+        <option value="<%= option.value %>" <%= option.value === month ? 'selected' : '' %>><%= option.label %></option>
+      <% }); %>
+    </select>
+    <noscript><button type="submit" class="btn-secondary btn-sm">Show</button></noscript>
+  </form>
+  <a href="/budgets?month=<%= month %>" class="btn-secondary btn-sm">
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3v18M3 11h18M7 7h10v10H7z"/>
+    </svg>
+    View budgets
+  </a>
+</div>
+
+<section class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Key figures">
+  <article class="stat-card">
+    <p class="stat-label">Total balance</p>
+    <p class="stat-value"><%= money(data.totalBalanceCents) %></p>
+    <p class="stat-hint">All accounts combined</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Income this month</p>
+    <p class="stat-value text-brand-700"><%= money(data.summary.incomeCents) %></p>
+    <p class="stat-hint"><%= formatMonth(month) %></p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Expenses this month</p>
+    <p class="stat-value text-rose-700"><%= money(data.summary.expenseCents) %></p>
+    <p class="stat-hint"><%= data.spendingByCategory.length %> categor<%= data.spendingByCategory.length === 1 ? 'y' : 'ies' %> with spending</p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Net this month</p>
+    <p class="stat-value <%= data.summary.netCents < 0 ? 'text-rose-700' : 'text-slate-900' %>"><%= money(data.summary.netCents) %></p>
+    <p class="stat-hint">
+      <% if (data.summary.savingsRate === null) { %>
+        No income recorded
+      <% } else { %>
+        Savings rate <%= data.summary.savingsRate %>% of income
+      <% } %>
+    </p>
+  </article>
+</section>
+
+<section class="mt-6 grid gap-6 xl:grid-cols-5">
+  <article class="card xl:col-span-3">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Spending by category</h2>
+        <p class="card-subtitle">Where the money went in <%= formatMonth(month) %></p>
+      </div>
+    </div>
+    <div class="chart-wrap chart-wrap-doughnut">
+      <canvas id="spendingChart" aria-label="Doughnut chart of spending by category" role="img"></canvas>
+      <p id="spendingEmpty" class="chart-empty" hidden>No expenses recorded for this month.</p>
+    </div>
+    <% if (data.spendingByCategory.length) { %>
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2" id="spendingLegend">
+        <% data.spendingByCategory.forEach(function (item) { %>
+          <li class="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-3 py-2 text-sm">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: <%= item.colour %>"></span>
+              <span class="truncate"><%= item.name %></span>
+            </span>
+            <span class="shrink-0 font-semibold text-slate-700"><%= money(item.amountCents) %></span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </article>
+
+  <article class="card xl:col-span-2">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Income and expenses</h2>
+        <p class="card-subtitle">Last six months</p>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="trendChart" aria-label="Bar chart comparing income and expenses over six months" role="img"></canvas>
+    </div>
+  </article>
+</section>
+
+<section class="mt-6 grid gap-6 xl:grid-cols-5">
+  <article class="card xl:col-span-2">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Budget progress</h2>
+        <p class="card-subtitle">Top categories for <%= formatMonth(month) %></p>
+      </div>
+      <a href="/budgets?month=<%= month %>" class="text-sm font-semibold text-brand-700 hover:text-brand-800">Manage</a>
+    </div>
+    <% if (!data.budgetStatus.length) { %>
+      <p class="empty-state">No budgets or spending yet. Set a budget to start tracking.</p>
+    <% } else { %>
+      <ul class="space-y-4">
+        <% data.budgetStatus.forEach(function (item) { %>
+          <li>
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="flex min-w-0 items-center gap-2">
+                <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: <%= item.colour %>"></span>
+                <span class="truncate font-medium text-slate-700"><%= item.name %></span>
+              </span>
+              <span class="shrink-0 text-slate-500">
+                <% if (item.budgetCents > 0) { %>
+                  <%= money(item.spentCents) %> of <%= money(item.budgetCents) %>
+                <% } else { %>
+                  <%= money(item.spentCents) %> spent
+                <% } %>
+              </span>
+            </div>
+            <div class="progress mt-2">
+              <span class="progress-bar <%= item.percent !== null && item.percent > 100 ? 'progress-bar-over' : '' %>" style="width: <%= Math.min(item.percent === null ? 0 : item.percent, 100) %>%"></span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">
+              <% if (item.budgetCents === 0) { %>
+                No budget set
+              <% } else if (item.remainingCents < 0) { %>
+                <%= money(Math.abs(item.remainingCents)) %> over budget
+              <% } else { %>
+                <%= money(item.remainingCents) %> left
+              <% } %>
+            </p>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </article>
+
+  <article class="card xl:col-span-3">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Recent transactions</h2>
+        <p class="card-subtitle">The latest activity across all accounts</p>
+      </div>
+      <a href="/transactions" class="text-sm font-semibold text-brand-700 hover:text-brand-800">See all</a>
+    </div>
+    <% if (!data.recentTransactions.length) { %>
+      <p class="empty-state">No transactions yet. Add your first one to get started.</p>
+    <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Description</th>
+              <th scope="col" class="hidden sm:table-cell">Category</th>
+              <th scope="col" class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% data.recentTransactions.forEach(function (item) { %>
+              <tr>
+                <td class="whitespace-nowrap text-slate-500"><%= formatDate(item.transaction_date) %></td>
+                <td>
+                  <a href="/transactions/<%= item.id %>/edit" class="font-medium text-slate-800 hover:text-brand-700"><%= item.description %></a>
+                  <span class="block text-xs text-slate-500"><%= item.account_name %></span>
+                </td>
+                <td class="hidden sm:table-cell">
+                  <span class="badge" style="background-color: <%= item.category_colour %>1a; color: <%= item.category_colour %>"><%= item.category_name %></span>
+                </td>
+                <td class="whitespace-nowrap text-right font-semibold <%= item.type === 'income' ? 'text-brand-700' : 'text-slate-800' %>">
+                  <%= item.type === 'income' ? '+' : '-' %><%= money(item.amount_cents) %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </article>
+</section>
+
+<script id="dashboard-data" type="application/json"><%- dashboardJson %></script>

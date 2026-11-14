@@ -1,0 +1,153 @@
+<%
+  const totalPercent = totals.budgetCents > 0 ? Math.round((totals.spentCents / totals.budgetCents) * 100) : null;
+%>
+
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <form method="get" action="/budgets" class="flex flex-wrap items-center gap-2">
+    <label for="budget-month" class="label mb-0">Month</label>
+    <select id="budget-month" name="month" class="select w-auto" data-auto-submit>
+      <% months.forEach(function (option) { %>
+        <option value="<%= option.value %>" <%= option.value === month ? 'selected' : '' %>><%= option.label %></option>
+      <% }); %>
+    </select>
+    <noscript><button type="submit" class="btn-secondary btn-sm">Show</button></noscript>
+  </form>
+  <p class="text-xs text-slate-500">Leave an amount empty to remove that budget.</p>
+</div>
+
+<section class="mt-5 grid gap-4 sm:grid-cols-3" aria-label="Budget totals">
+  <article class="stat-card">
+    <p class="stat-label">Planned budget</p>
+    <p class="stat-value"><%= money(totals.budgetCents) %></p>
+    <p class="stat-hint"><%= formatMonth(month) %></p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Spent so far</p>
+    <p class="stat-value text-rose-700"><%= money(totals.spentCents) %></p>
+    <p class="stat-hint">
+      <% if (totalPercent === null) { %>
+        No budget set for this month
+      <% } else { %>
+        <%= totalPercent %>% of the planned budget
+      <% } %>
+    </p>
+  </article>
+  <article class="stat-card">
+    <p class="stat-label">Remaining</p>
+    <p class="stat-value <%= totals.remainingCents < 0 ? 'text-rose-700' : 'text-brand-700' %>"><%= money(totals.remainingCents) %></p>
+    <p class="stat-hint"><%= totals.remainingCents < 0 ? 'Over the planned budget' : 'Still available to spend' %></p>
+  </article>
+</section>
+
+<section class="mt-6 grid gap-6 xl:grid-cols-5">
+  <article class="card xl:col-span-3">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Budget vs actual</h2>
+        <p class="card-subtitle">Expense categories for <%= formatMonth(month) %></p>
+      </div>
+    </div>
+    <div class="chart-wrap chart-wrap-tall">
+      <canvas id="budgetChart" aria-label="Bar chart comparing planned budgets with actual spending" role="img"></canvas>
+    </div>
+  </article>
+
+  <article class="card xl:col-span-2">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">How to read this</h2>
+        <p class="card-subtitle">Budgets are stored per category and month</p>
+      </div>
+    </div>
+    <ul class="space-y-3 text-sm text-slate-600">
+      <li class="flex gap-3">
+        <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">1</span>
+        <span>Set an amount for each expense category you want to control.</span>
+      </li>
+      <li class="flex gap-3">
+        <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">2</span>
+        <span>Spending is calculated from transactions recorded in the same month.</span>
+      </li>
+      <li class="flex gap-3">
+        <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">3</span>
+        <span>A red bar means the category went over its planned amount.</span>
+      </li>
+    </ul>
+    <p class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+      Budgets are upserted with a unique constraint on category and month, so saving twice updates rather than duplicates.
+    </p>
+  </article>
+</section>
+
+<section class="card mt-6">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Set budgets</h2>
+      <p class="card-subtitle">Amounts are in euro and saved together</p>
+    </div>
+  </div>
+
+  <form method="post" action="/budgets" novalidate>
+    <input type="hidden" name="month" value="<%= month %>">
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Spent</th>
+            <th scope="col">Budget (EUR)</th>
+            <th scope="col" class="hidden sm:table-cell">Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% status.forEach(function (item) { %>
+            <% const rawValue = Object.prototype.hasOwnProperty.call(values, item.id) ? values[item.id] : (item.budgetCents > 0 ? (item.budgetCents / 100).toFixed(2) : ''); %>
+            <tr>
+              <td>
+                <span class="flex items-center gap-2">
+                  <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: <%= item.colour %>"></span>
+                  <span class="font-medium text-slate-800"><%= item.name %></span>
+                </span>
+                <span class="mt-0.5 block text-xs text-slate-500">
+                  <% if (item.budgetCents === 0) { %>
+                    No budget set
+                  <% } else if (item.remainingCents < 0) { %>
+                    <%= money(Math.abs(item.remainingCents)) %> over
+                  <% } else { %>
+                    <%= money(item.remainingCents) %> left
+                  <% } %>
+                </span>
+              </td>
+              <td class="whitespace-nowrap text-slate-600"><%= money(item.spentCents) %></td>
+              <td>
+                <label class="sr-only" for="budget-<%= item.id %>">Budget for <%= item.name %></label>
+                <input id="budget-<%= item.id %>" name="budget_<%= item.id %>" type="text" inputmode="decimal" class="input input-sm w-28 <%= errors[item.id] ? 'input-error' : '' %>" value="<%= rawValue %>" placeholder="0.00">
+                <% if (errors[item.id]) { %><p class="error-text"><%= errors[item.id] %></p><% } %>
+              </td>
+              <td class="hidden sm:table-cell">
+                <% if (item.percent === null) { %>
+                  <span class="text-xs text-slate-400">Not budgeted</span>
+                <% } else { %>
+                  <div class="flex items-center gap-2">
+                    <div class="progress w-32">
+                      <span class="progress-bar <%= item.percent > 100 ? 'progress-bar-over' : '' %>" style="width: <%= Math.min(item.percent, 100) %>%"></span>
+                    </div>
+                    <span class="text-xs font-medium <%= item.percent > 100 ? 'text-rose-700' : 'text-slate-500' %>"><%= item.percent %>%</span>
+                  </div>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <button type="submit" class="btn-primary">Save budgets</button>
+      <a href="/budgets?month=<%= month %>" class="btn-secondary">Reset</a>
+      <a href="/" class="ml-auto text-sm font-semibold text-brand-700 hover:text-brand-800">Back to dashboard</a>
+    </div>
+  </form>
+</section>
+
+<script id="budget-data" type="application/json"><%- budgetJson %></script>

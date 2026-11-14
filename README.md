@@ -1,6 +1,6 @@
 # Finance Tracker
 
-A solo final project for **H6WAD Web Application Development** at National College of Ireland.
+A solo final project for **Web Application Development** at National College of Ireland.
 
 Finance Tracker is a server-rendered personal finance application built with Node.js, Express, SQLite, EJS and Chart.js. It stores accounts, categories, transactions and monthly budgets in a relational database, validates every write at three levels, and visualises spending and budget performance in the browser.
 

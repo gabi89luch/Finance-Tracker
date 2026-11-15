@@ -162,20 +162,6 @@ Render's free tier has an ephemeral filesystem. The SQLite file is recreated and
 
 The free instance also spins down after inactivity, so the first request after a quiet period can take up to a minute.
 
-## Report and video
-
-- `docs/report.md` is the editable report source (1,865 words, excluding references).
-- `docs/report.pdf` is the formatted PDF with the cover page, name and student ID.
-- Rebuild the PDF after editing the Markdown:
-
-```bash
-python3 docs/build_report.py
-```
-
-The PDF requires ReportLab. Replace the two placeholders in section 9 (`[add the deployed URL]` and `[add the video link]`) before submitting, then rebuild the PDF.
-
-`docs/video-plan.md` contains a 10-minute recording plan and a pre-recording checklist.
-
 ## Notes
 
 - No authentication is included. This is a single-user demonstration and should not hold real financial data.

@@ -27,7 +27,7 @@
   Chart.defaults.color = "#64748b";
 
   const tooltipOptions = {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#14231b",
     padding: 10,
     cornerRadius: 8,
     titleFont: { weight: "600" },
@@ -45,7 +45,7 @@
         datasets: [{
           data: spending.map(function (item) { return item.amountCents / 100; }),
           backgroundColor: spending.map(function (item) { return item.colour; }),
-          borderColor: "#ffffff",
+          borderColor: "#faf9f5",
           borderWidth: 2,
           hoverOffset: 6,
         }],
@@ -86,14 +86,14 @@
           {
             label: "Income",
             data: trend.map(function (item) { return item.incomeCents / 100; }),
-            backgroundColor: "#10b981",
+            backgroundColor: "#123524",
             borderRadius: 6,
             maxBarThickness: 22,
           },
           {
             label: "Expenses",
             data: trend.map(function (item) { return item.expenseCents / 100; }),
-            backgroundColor: "#f43f5e",
+            backgroundColor: "#b4533a",
             borderRadius: 6,
             maxBarThickness: 22,
           },
@@ -120,11 +120,14 @@
           x: {
             grid: { display: false },
             border: { display: false },
+            ticks: { color: "#5b6b5f" },
           },
           y: {
             beginAtZero: true,
             border: { display: false },
+            grid: { color: "#e6e1d8" },
             ticks: {
+              color: "#5b6b5f",
               callback: function (value) {
                 return value >= 1000 ? "EUR " + value / 1000 + "k" : "EUR " + value;
               },

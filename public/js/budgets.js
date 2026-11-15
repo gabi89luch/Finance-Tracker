@@ -46,7 +46,7 @@
         {
           label: "Budget",
           data: rows.map(function (item) { return item.budgetCents / 100; }),
-          backgroundColor: "#d4cec3",
+          backgroundColor: "#d4cdc0",
           borderRadius: 5,
           maxBarThickness: 18,
         },
@@ -54,7 +54,7 @@
           label: "Spent",
           data: rows.map(function (item) { return item.spentCents / 100; }),
           backgroundColor: rows.map(function (item) {
-            return item.budgetCents > 0 && item.spentCents > item.budgetCents ? "#b4533a" : "#123524";
+            return item.budgetCents > 0 && item.spentCents > item.budgetCents ? "#9B2226" : "#1B4D5C";
           }),
           borderRadius: 5,
           maxBarThickness: 18,
@@ -72,7 +72,7 @@
           labels: { usePointStyle: true, pointStyle: "circle", boxWidth: 8, padding: 16 },
         },
         tooltip: {
-          backgroundColor: "#14231b",
+          backgroundColor: "#1a1a1a",
           padding: 10,
           cornerRadius: 8,
           callbacks: {
@@ -86,9 +86,9 @@
         x: {
           beginAtZero: true,
           border: { display: false },
-          grid: { color: "#e6e1d8" },
+          grid: { color: "#e8e2d8" },
           ticks: {
-            color: "#5b6b5f",
+            color: "#6b6560",
             callback: function (value) {
               return value >= 1000 ? "EUR " + value / 1000 + "k" : "EUR " + value;
             },
@@ -97,7 +97,7 @@
         y: {
           grid: { display: false },
           border: { display: false },
-          ticks: { color: "#5b6b5f" },
+          ticks: { color: "#6b6560" },
         },
       },
     },

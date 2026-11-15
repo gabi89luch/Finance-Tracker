@@ -7,7 +7,7 @@
           <p class="card-subtitle">A solo personal finance tracker for the H6WAD final project</p>
         </div>
       </div>
-      <div class="prose-sm max-w-none space-y-3 text-slate-600">
+      <div class="prose-sm max-w-none space-y-3 text-slate-500">
         <p>
           Finance Tracker stores accounts, categories, transactions and monthly budgets in a SQLite
           database. Every page is rendered on the server with Express and EJS, and the dashboard and
@@ -28,21 +28,21 @@
           <p class="card-subtitle">Four related tables with constraints and triggers</p>
         </div>
       </div>
-      <div class="space-y-4 text-sm text-slate-600">
-        <div class="rounded-lg border border-slate-200 p-4">
-          <h3 class="font-semibold text-slate-900">accounts</h3>
+      <div class="space-y-4 text-sm text-slate-500">
+        <div class="rounded-lg border border-slate-700/60 p-4">
+          <h3 class="font-semibold text-slate-800">accounts</h3>
           <p class="mt-1">Name, type (current, savings, credit, cash), opening balance and a colour used in the interface.</p>
         </div>
-        <div class="rounded-lg border border-slate-200 p-4">
-          <h3 class="font-semibold text-slate-900">categories</h3>
+        <div class="rounded-lg border border-slate-700/60 p-4">
+          <h3 class="font-semibold text-slate-800">categories</h3>
           <p class="mt-1">Name, kind (income or expense) and a colour. Names are unique regardless of case.</p>
         </div>
-        <div class="rounded-lg border border-slate-200 p-4">
-          <h3 class="font-semibold text-slate-900">transactions</h3>
+        <div class="rounded-lg border border-slate-700/60 p-4">
+          <h3 class="font-semibold text-slate-800">transactions</h3>
           <p class="mt-1">Links one account and one category, with a type, positive amount, description and date. Foreign keys use <code>ON DELETE RESTRICT</code>.</p>
         </div>
-        <div class="rounded-lg border border-slate-200 p-4">
-          <h3 class="font-semibold text-slate-900">budgets</h3>
+        <div class="rounded-lg border border-slate-700/60 p-4">
+          <h3 class="font-semibold text-slate-800">budgets</h3>
           <p class="mt-1">A planned amount per category and month. A unique constraint on the pair makes saving an upsert.</p>
         </div>
         <p>
@@ -59,7 +59,7 @@
           <p class="card-subtitle">Checks on the client, on the server and in the database</p>
         </div>
       </div>
-      <ul class="space-y-2 text-sm text-slate-600">
+      <ul class="space-y-2 text-sm text-slate-500">
         <li>HTML inputs use types, lengths and limits to guide the user.</li>
         <li>The server re-validates every field: amounts, dates, descriptions, foreign keys and colours.</li>
         <li>SQLite CHECK constraints, foreign keys and triggers enforce the same rules at the storage layer.</li>
@@ -114,9 +114,9 @@
           <h2 class="card-title">Student</h2>
         </div>
       </div>
-      <p class="font-semibold text-slate-900">Valentin Gabriel Luchian</p>
+      <p class="font-semibold text-slate-800">Valentin Gabriel Luchian</p>
       <p class="text-sm text-slate-500">Student ID 24318230</p>
-      <p class="mt-3 text-sm text-slate-600">H6WAD Web Application Development, National College of Ireland, 2026.</p>
+      <p class="mt-3 text-sm text-slate-500">H6WAD Web Application Development, National College of Ireland, 2026.</p>
     </article>
 
     <article class="card">

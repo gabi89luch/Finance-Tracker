@@ -59,7 +59,7 @@
         <p class="card-subtitle">Budgets are stored per category and month</p>
       </div>
     </div>
-    <ul class="space-y-3 text-sm text-slate-600">
+    <ul class="space-y-3 text-sm text-slate-500">
       <li class="flex gap-3">
         <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-800">1</span>
         <span>Set an amount for each expense category you want to control.</span>
@@ -73,7 +73,7 @@
         <span>A red bar means the category went over its planned amount.</span>
       </li>
     </ul>
-    <p class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+    <p class="mt-4 rounded-lg bg-slate-800/60 p-3 text-xs text-slate-500">
       Budgets are upserted with a unique constraint on category and month, so saving twice updates rather than duplicates.
     </p>
   </article>
@@ -118,7 +118,7 @@
                   <% } %>
                 </span>
               </td>
-              <td class="whitespace-nowrap text-slate-600"><%= money(item.spentCents) %></td>
+              <td class="whitespace-nowrap text-slate-500"><%= money(item.spentCents) %></td>
               <td>
                 <label class="sr-only" for="budget-<%= item.id %>">Budget for <%= item.name %></label>
                 <input id="budget-<%= item.id %>" name="budget_<%= item.id %>" type="text" inputmode="decimal" class="input input-sm w-28 <%= errors[item.id] ? 'input-error' : '' %>" value="<%= rawValue %>" placeholder="0.00">
@@ -126,7 +126,7 @@
               </td>
               <td class="hidden sm:table-cell">
                 <% if (item.percent === null) { %>
-                  <span class="text-xs text-slate-400">Not budgeted</span>
+                  <span class="text-xs text-slate-500">Not budgeted</span>
                 <% } else { %>
                   <div class="flex items-center gap-2">
                     <div class="progress w-32">

@@ -110,7 +110,7 @@
                 <span class="badge" style="background-color: <%= item.category_colour %>1a; color: <%= item.category_colour %>"><%= item.category_name %></span>
               </td>
               <td class="hidden lg:table-cell">
-                <span class="flex items-center gap-2 text-slate-600">
+                <span class="flex items-center gap-2 text-slate-500">
                   <span class="h-2 w-2 rounded-full" style="background-color: <%= item.account_colour %>"></span>
                   <%= item.account_name %>
                 </span>
@@ -141,7 +141,7 @@
             <% if (number === 1 || number === pages || Math.abs(number - page) <= 1) { %>
               <a href="<%= pageHref(number) %>" class="page-link <%= number === page ? 'page-link-active' : '' %>" <%= number === page ? 'aria-current="page"' : '' %>><%= number %></a>
             <% } else if (Math.abs(number - page) === 2) { %>
-              <span class="px-1 text-slate-400">&hellip;</span>
+              <span class="px-1 text-slate-500">&hellip;</span>
             <% } %>
           <% } %>
           <% if (page < pages) { %>
